@@ -1,0 +1,19 @@
+# Executing master from cli.
+sudo mesos-master --hostname=192.168.162.139 --ip=192.168.162.139 --work_dir=/tmp/mesos/master --allocation_interval=5secs
+# Executing a container-capable slave from cli. Change hostname/ip for different hosts.
+sudo mesos-slave --master=192.168.162.139:5050 --containerizers=mesos,docker --image_providers=docker --isolation=filesystem/linux,docker/runtime --executor_enviroent_variables="{}" --work_dir=/tmp/mesos/agent --ip=192.168.162.133 --hostname=host2
+
+# Start a container with a redis server that listens on default port.
+sudo mesos-execute --master=192.168.162.139:5050 --name=redis --docker_image=library/redis --shell=false
+# Start a container with a redis server that listens on port 7777.
+sudo mesos-execute --master=192.168.162.139:5050 --name=redis2 --docker_image=nimayd/redis --shell=false
+
+# Start redis cli in a container through the host.
+sudo docker run -ti --net=host redis redis-cli
+# Start redis cli in a container through the mesos and set key x to value "hello".
+sudo mesos-execute --master=192.168.162.139:5050 --name=redis_cli --docker_image=library/redis --shell=true --command="redis-cli
+SET x hello"
+# Start redis cli in a container through the mesos and connect to server on port 7777.
+sudo mesos-execute --master=192.168.162.139:5050 --name=redis_cli --docker_image=library/redis --shell=true --command="redis-cli -p 7777"
+
+
